@@ -1,4 +1,4 @@
-package com.example.myapplication.controller;
+package com.example.myapplication.controller.activity;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -12,10 +12,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.myapplication.R;
+import com.example.myapplication.enums.QuestionTextColor;
 import com.example.myapplication.model.Question;
-
-import java.util.ArrayList;
-import java.util.Arrays;
 
 public class QuizActivity extends AppCompatActivity {
 
@@ -52,7 +50,7 @@ public class QuizActivity extends AppCompatActivity {
             mCurrentScore = savedInstanceState.getInt(BUNDLE_KEY_CURRENT_SCORE);
             isAnsweredArray = savedInstanceState.getBooleanArray(BUNDLE_KEY_IS_ANSWERED_ARRAY);
             for (int i = 0; i < isAnsweredArray.length; i++) {
-                mQuestionBank[i].mIsAnswered = isAnsweredArray[i];
+                mQuestionBank[i].setIsAnswered(isAnsweredArray[i]);
             }
         }
 
@@ -126,7 +124,7 @@ public class QuizActivity extends AppCompatActivity {
             public void onClick(View v) {
                 checkAnswer(true);
                 isAnsweredArray[mCurrentIndex] = true;
-                mQuestionBank[mCurrentIndex].mIsAnswered = true;
+                mQuestionBank[mCurrentIndex].setIsAnswered(true);
             }
         });
 
@@ -135,7 +133,7 @@ public class QuizActivity extends AppCompatActivity {
             public void onClick(View v) {
                 checkAnswer(false);
                 isAnsweredArray[mCurrentIndex] = true;
-                mQuestionBank[mCurrentIndex].mIsAnswered = true;
+                mQuestionBank[mCurrentIndex].setIsAnswered(true);
             }
         });
 
@@ -240,7 +238,7 @@ public class QuizActivity extends AppCompatActivity {
                 canCheat = stringToBoolean(insideArray[2]);
                 color = insideArray[3];
 
-                questions[i] = new Question(question, trueAnswer, false, canCheat, color);
+                questions[i] = new Question(question, trueAnswer, false, canCheat, "Red");
             } catch (IndexOutOfBoundsException exc) {
 
             }
