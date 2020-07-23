@@ -7,15 +7,15 @@
     android:gravity="center"
     android:orientation="vertical"
     tools:context=".controller.activity.QuizBuilderActivity">
-
-
         <EditText
 
             android:id="@+id/edit_text_questions"
             android:layout_width="wrap_content"
             android:lines="8"
-            android:text="{[{“Tehran in iran”}, {true}, {false}, {green}],[{“iran language is english”}, {false} {true}, {red}], [{“England is in usa”}, {false}, {false}, {black}] , {400}"
-                    android:layout_height="wrap_content"
+            android:text="{[{“Tehran in iran”}, {true}, {false}, {green}],[{“iran language is english”}, {false} ,{true}, {red}], [{“England is in usa”}, {false}, {false}, {black}]} , {30}
+{[{“Tehran in iran”}, {true}, {false}, {green}],[{“iran language is english”}, {false} ,{true}, {red}], [{“England is in usa”}, {false}, {false}, {black}]} , {30}
+{[{“Tehran in iran”}, {true}, {false}, {green}],[{“iran language is english”}, {false} ,{true}, {red}], [{“England is in usa”}, {false}, {false}, {black}]} , {30}"
+            android:layout_height="wrap_content"
             android:padding="12dp"
             android:hint="@string/enter_questions"
             android:includeFontPadding="false"

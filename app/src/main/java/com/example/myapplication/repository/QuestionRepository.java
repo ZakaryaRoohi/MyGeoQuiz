@@ -10,7 +10,7 @@ import java.util.UUID;
 public class QuestionRepository implements RepositoryInterface {
     private static QuestionRepository sQuestionRepository;
     private static final int NUMBER_OF_QUESTIONS = 20;
-
+    List<Question> mReceiveQuestions;
     public static QuestionRepository getInstance() {
         if (sQuestionRepository == null) {
             sQuestionRepository = new QuestionRepository();
@@ -29,12 +29,13 @@ public class QuestionRepository implements RepositoryInterface {
         mQuestions=questions;
     }
     private QuestionRepository(){
-        mQuestions= new ArrayList<>();
-        for (int i = 0; i <NUMBER_OF_QUESTIONS ; i++) {
-            Question question = new Question("tehran is capital of iran",true,
-                    false,true,"black");
-            mQuestions.add(question);
-        }
+//        mQuestions= new ArrayList<>();
+//        for (int i = 0; i <mReceiveQuestions.size() ; i++) {
+//            Question question = new Question(mReceiveQuestions.get(i).getTextQuestion(),mReceiveQuestions.get(i).getAnswerTrue(),
+//                    mReceiveQuestions.get(i).getIsAnswered(),mReceiveQuestions.get(i).getCanCheat(),mReceiveQuestions.get(i).getQuestionTextColor());
+//            mQuestions.add(question);
+//        }
+
     }
 
     public Question getQuestion(UUID uuid){

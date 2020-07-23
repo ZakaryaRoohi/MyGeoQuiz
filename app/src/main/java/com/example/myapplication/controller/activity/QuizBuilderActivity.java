@@ -7,11 +7,14 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.example.myapplication.R;
 import com.example.myapplication.model.Question;
+import com.example.myapplication.repository.QuestionRepository;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class QuizBuilderActivity extends AppCompatActivity {
     public static final String EXTRA_QUESTIONS = "questions";
@@ -38,12 +41,20 @@ public class QuizBuilderActivity extends AppCompatActivity {
         mButtonStart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String questions = mEditText.getText().toString();
+                if(mEditText.getText().toString()==null||mEditText.getText().toString().length()==0){
+                    Toast.makeText(QuizBuilderActivity.this,"Invalid Input",Toast.LENGTH_SHORT).show();
+                }
+                else{
+                    String stringQuestions = mEditText.getText().toString();
 //                Intent intent = new Intent(QuizBuilderActivity.this,QuizActivity.class);
 //                intent.putExtra(EXTRA_QUESTIONS,questions);
 //                startActivity(intent);
-                Intent intent = new Intent(QuizBuilderActivity.this,QuestionListActivity.class);
-                startActivity(intent);
+                    List<Question> questionList=parseQuestions(stringQuestions);
+                    QuestionRepository.getInstance().setQuestions(questionList);
+                    Intent intent = new Intent(QuizBuilderActivity.this, QuestionListActivity.class);
+                    startActivity(intent);
+                }
+
 
             }
         });
