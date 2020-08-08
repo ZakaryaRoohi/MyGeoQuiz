@@ -11,6 +11,7 @@ public class QuestionRepository implements RepositoryInterface {
     private static QuestionRepository sQuestionRepository;
     private static final int NUMBER_OF_QUESTIONS = 20;
     List<Question> mReceiveQuestions;
+
     public static QuestionRepository getInstance() {
         if (sQuestionRepository == null) {
             sQuestionRepository = new QuestionRepository();
@@ -25,10 +26,12 @@ public class QuestionRepository implements RepositoryInterface {
     public List<Question> getQuestions() {
         return mQuestions;
     }
-    public void setQuestions(List<Question> questions){
-        mQuestions=questions;
+
+    public void setQuestions(List<Question> questions) {
+        mQuestions = questions;
     }
-    private QuestionRepository(){
+
+    private QuestionRepository() {
 //        mQuestions= new ArrayList<>();
 //        for (int i = 0; i <mReceiveQuestions.size() ; i++) {
 //            Question question = new Question(mReceiveQuestions.get(i).getTextQuestion(),mReceiveQuestions.get(i).getAnswerTrue(),
@@ -38,9 +41,9 @@ public class QuestionRepository implements RepositoryInterface {
 
     }
 
-    public Question getQuestion(UUID uuid){
-        for(Question question:mQuestions){
-            if(question.getId().equals(uuid))
+    public Question getQuestion(UUID uuid) {
+        for (Question question : mQuestions) {
+            if (question.getId().equals(uuid))
                 return question;
         }
         return null;

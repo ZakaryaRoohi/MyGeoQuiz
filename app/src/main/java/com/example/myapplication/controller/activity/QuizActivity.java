@@ -12,8 +12,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.myapplication.R;
-import com.example.myapplication.enums.QuestionTextColor;
 import com.example.myapplication.model.Question;
+import com.example.myapplication.repository.QuestionRepository;
+import com.example.myapplication.repository.RepositoryInterface;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 public class QuizActivity extends AppCompatActivity {
 
@@ -26,16 +31,15 @@ public class QuizActivity extends AppCompatActivity {
     private ImageButton mImageButtonPrevious;
     private TextView mTextViewScore;
     private Button mButtonReset;
-//        public String intentQuestions = "{[{“Tehran in iran”}, {true}, {false}, {green}],[{“iran language is english”}, {false} {true}, {red}], [{“England is in usa”}, {false}, {false}, {black}]} , {30}";
     public String intentQuestions;
-
+    private RepositoryInterface mRepository;
     public static final String BUNDLE_KEY_CURRENT_INDEX = "mCurrentIndex";
     public static final String BUNDLE_KEY_CURRENT_SCORE = "mCurrentScore";
     public static final String BUNDLE_KEY_IS_ANSWERED_ARRAY = "mIsAnsweredArray";
     private int mCurrentIndex = 0;
     private int mCurrentScore = 0;
-    boolean[] isAnsweredArray = {false, false, false};
-    private Question[] mQuestionBank;
+    private List<Question> mQuestionBank;
+
 
     //*************************           On Create         **************************
     @Override
@@ -43,15 +47,13 @@ public class QuizActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         Intent intent = getIntent();
         intentQuestions = intent.getStringExtra(QuizBuilderActivity.EXTRA_QUESTIONS);
-        mQuestionBank = parseStringToQuestionArray(intentQuestions);
-//        intentQuestions = "{[{“Tehran in iran”}, {true}, {false}, {green}],[{“iran language is english”}, {false} {true}, {red}], [{“England is in usa”}, {false}, {false}, {black}] , {30}";
+        mRepository = QuestionRepository.getInstance();
+        mQuestionBank = mRepository.getQuestions();
+
         if (savedInstanceState != null) {
             mCurrentIndex = savedInstanceState.getInt(BUNDLE_KEY_CURRENT_INDEX);
             mCurrentScore = savedInstanceState.getInt(BUNDLE_KEY_CURRENT_SCORE);
-            isAnsweredArray = savedInstanceState.getBooleanArray(BUNDLE_KEY_IS_ANSWERED_ARRAY);
-            for (int i = 0; i < isAnsweredArray.length; i++) {
-                mQuestionBank[i].setIsAnswered(isAnsweredArray[i]);
-            }
+
         }
 
 //        show();
@@ -71,7 +73,6 @@ public class QuizActivity extends AppCompatActivity {
         super.onSaveInstanceState(outState);
         outState.putInt(BUNDLE_KEY_CURRENT_INDEX, mCurrentIndex);
         outState.putInt(BUNDLE_KEY_CURRENT_SCORE, mCurrentScore);
-        outState.putBooleanArray(BUNDLE_KEY_IS_ANSWERED_ARRAY, isAnsweredArray);
     }
 
     //*************************           findAllViews         **************************
@@ -91,14 +92,14 @@ public class QuizActivity extends AppCompatActivity {
     //*************************           updateQuestion         **************************
     private void updateQuestion() {
 
-        if (isAnsweredArray[mCurrentIndex]) {
+        if (mQuestionBank.get(mCurrentIndex).getIsAnswered()) {
             mButtonTrue.setEnabled(false);
             mButtonFalse.setEnabled(false);
         } else {
             mButtonTrue.setEnabled(true);
             mButtonFalse.setEnabled(true);
         }
-        Question currentQuestion = mQuestionBank[mCurrentIndex];
+        Question currentQuestion = mQuestionBank.get(mCurrentIndex);
         mTextViewQuestion.setText(currentQuestion.getTextQuestion());
 
     }
@@ -106,8 +107,10 @@ public class QuizActivity extends AppCompatActivity {
     //*************************           resetQuestions         **************************
     public void resetQuestions() {
 //        for (Question question : mQuestionBank) question.mIsAnswered = false;
-        for (int i = 0; i < isAnsweredArray.length; i++)
-            isAnsweredArray[i] = false;
+        for (int i = 0; i < mQuestionBank.size(); i++)
+            mQuestionBank.get(i).setIsAnswered(false);
+//        isAnsweredArray.set(i, false);
+
     }
 
     //*************************           updateScore         **************************
@@ -123,8 +126,8 @@ public class QuizActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 checkAnswer(true);
-                isAnsweredArray[mCurrentIndex] = true;
-                mQuestionBank[mCurrentIndex].setIsAnswered(true);
+                mQuestionBank.get(mCurrentIndex).setIsAnswered(true);
+                mQuestionBank.get(mCurrentIndex).setIsAnswered(true);
             }
         });
 
@@ -132,15 +135,15 @@ public class QuizActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 checkAnswer(false);
-                isAnsweredArray[mCurrentIndex] = true;
-                mQuestionBank[mCurrentIndex].setIsAnswered(true);
+                mQuestionBank.get(mCurrentIndex).setIsAnswered(true);
+                mQuestionBank.get(mCurrentIndex).setIsAnswered(true);
             }
         });
 
         mImageButtonNext.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mCurrentIndex = (++mCurrentIndex) % mQuestionBank.length;
+                mCurrentIndex = (++mCurrentIndex) % mQuestionBank.size();
                 updateQuestion();
             }
         });
@@ -148,7 +151,7 @@ public class QuizActivity extends AppCompatActivity {
         mImageButtonPrevious.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mCurrentIndex = (--mCurrentIndex + mQuestionBank.length) % mQuestionBank.length;
+                mCurrentIndex = (--mCurrentIndex + mQuestionBank.size()) % mQuestionBank.size();
                 updateQuestion();
             }
         });
@@ -162,14 +165,14 @@ public class QuizActivity extends AppCompatActivity {
         mButtonLast.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mCurrentIndex = mQuestionBank.length - 1;
+                mCurrentIndex = mQuestionBank.size() - 1;
                 updateQuestion();
             }
         });
         mTextViewQuestion.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mCurrentIndex = (++mCurrentIndex) % mQuestionBank.length;
+                mCurrentIndex = (++mCurrentIndex) % mQuestionBank.size();
                 updateQuestion();
             }
         });
@@ -191,7 +194,7 @@ public class QuizActivity extends AppCompatActivity {
 
     //*************************           checkAnswer         **************************
     private void checkAnswer(boolean userPressed) {
-        boolean isAnswerTrue = mQuestionBank[mCurrentIndex].isAnswerTrue();
+        boolean isAnswerTrue = mQuestionBank.get(mCurrentIndex).isAnswerTrue();
 //        boolean isAnswerTrue = isAnsweredArray[mCurrentIndex];
         if (userPressed == isAnswerTrue) {
             Toast.makeText(this, R.string.toast_correct, Toast.LENGTH_LONG).show();
@@ -202,8 +205,8 @@ public class QuizActivity extends AppCompatActivity {
             Toast.makeText(this, R.string.toast_incorrect, Toast.LENGTH_LONG).show();
 
         }
-//        mQuestionBank[mCurrentIndex].mIsAnswered=true;
-        isAnsweredArray[mCurrentIndex] = true;
+        mQuestionBank.get(mCurrentIndex).setIsAnswered(true);
+
         mButtonTrue.setEnabled(false);
         mButtonFalse.setEnabled(false);
     }
@@ -212,60 +215,5 @@ public class QuizActivity extends AppCompatActivity {
         Toast.makeText(this, intentQuestions, Toast.LENGTH_LONG).show();
     }
 
-    private  Question[] parseStringToQuestionArray(String inputQuestion) {
-        String question, color;
-        boolean trueAnswer, canCheat;
-        int numberOfQuestion = 0;
-        for (int i = 0; i < inputQuestion.length() - 1; i++) {
-            if (inputQuestion.charAt(i) == ']')
-                numberOfQuestion++;
-        }
-        Question[] questions = new Question[numberOfQuestion];
-//                  "['{'-\\[-',']"
-        inputQuestion = inputQuestion.replaceAll("['{'-'\\['-,']", "");
-        String[] arrayOfString = inputQuestion.split("]");
-        for (int i = 0; i < numberOfQuestion; i++) {
-//            System.out.println(arrayOfString[i]);
-            String[] insideArray = arrayOfString[i].split("}");
-//            for (int j = 0; j < insideArray.length; j++) {
-//
-//                System.out.println(insideArray[j]);
-//
-//            }
-            try {
-                question = insideArray[0];
-                trueAnswer = stringToBoolean(insideArray[1]);
-                canCheat = stringToBoolean(insideArray[2]);
-                color = insideArray[3];
-
-                questions[i] = new Question(question, trueAnswer, false, canCheat, "Red");
-            } catch (IndexOutOfBoundsException exc) {
-
-            }
-//            System.out.println("*************************");
-
-        }
-        return questions;
-    }
-
-    private   boolean stringToBoolean(String str) {
-        boolean result;
-        if (str.contains("true"))
-            result = true;
-        else
-            result = false;
-        return result;
-    }
-
-//    public static void main(String[] args) {
-//        String questions = "{[{\"Tehran in iran\"}, {true}, {false}, {green}],[{\"iran language is english\"}, {false} {true}, {red}], [{\"England is in usa\"}, {false}, {false}, {black}] , {30}";
-//        Question[] q = parseStringToQuestionArray(questions);
-//        for (int i = 0; i < q.length; i++) {
-//            System.out.println(q[i].getTextQuestion() + "    " + q[i].mAnswerTrue
-//                    + "  " + q[i].mIsAnswered + "     " + q[i].mCanCheat + "      " + q[i].mColor);
-//        }
-//        System.out.println(Arrays.toString(q));
-//    }
-//    {[{“Tehran in iran”}, {true}, {false}, {green}],[{“iran language is english”}, {false} {true}, {red}], [{“England is in usa”}, {false}, {false}, {black}]} , {30}
 
 }

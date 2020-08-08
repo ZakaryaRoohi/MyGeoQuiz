@@ -35,21 +35,22 @@ public class QuizBuilderActivity extends AppCompatActivity {
     private void FindAllView() {
         mButtonStart = findViewById(R.id.button_start);
         mEditText = findViewById(R.id.edit_text_questions);
+
     }
-//"{[{“Tehran in iran”}, {true}, {false}, {green}],[{“iran language is english”}, {false} {true}, {red}], [{“England is in usa”}, {false}, {false}, {black}] , {30}";
+
+    //"{[{“Tehran in iran”}, {true}, {false}, {green}],[{“iran language is english”}, {false} {true}, {red}], [{“England is in usa”}, {false}, {false}, {black}] , {30}";
     private void setOnClickListener() {
         mButtonStart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(mEditText.getText().toString()==null||mEditText.getText().toString().length()==0){
-                    Toast.makeText(QuizBuilderActivity.this,"Invalid Input",Toast.LENGTH_SHORT).show();
-                }
-                else{
+                if (mEditText.getText().toString() == null || mEditText.getText().toString().length() == 0) {
+                    Toast.makeText(QuizBuilderActivity.this, "Invalid Input", Toast.LENGTH_SHORT).show();
+                } else {
                     String stringQuestions = mEditText.getText().toString();
 //                Intent intent = new Intent(QuizBuilderActivity.this,QuizActivity.class);
 //                intent.putExtra(EXTRA_QUESTIONS,questions);
 //                startActivity(intent);
-                    List<Question> questionList=parseQuestions(stringQuestions);
+                    List<Question> questionList = parseQuestions(stringQuestions);
                     QuestionRepository.getInstance().setQuestions(questionList);
                     Intent intent = new Intent(QuizBuilderActivity.this, QuestionListActivity.class);
                     startActivity(intent);
@@ -59,6 +60,7 @@ public class QuizBuilderActivity extends AppCompatActivity {
             }
         });
     }
+
     private static ArrayList<Question> parseQuestions(String s) {
         ArrayList<Question> mQuestionsBank = new ArrayList<>();
         int firstBracket;

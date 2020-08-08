@@ -7,29 +7,27 @@
     android:gravity="center"
     android:orientation="vertical"
     tools:context=".controller.activity.QuizBuilderActivity">
-        <EditText
 
-            android:id="@+id/edit_text_questions"
-            android:layout_width="wrap_content"
-            android:lines="8"
-            android:text="{[{“Tehran in iran”}, {true}, {false}, {green}],[{“iran language is english”}, {false} ,{true}, {red}], [{“England is in usa”}, {false}, {false}, {black}]} , {30}
+    <EditText
+
+        android:id="@+id/edit_text_questions"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:hint="@string/enter_questions"
+        android:includeFontPadding="false"
+        android:inputType="number"
+        android:lines="8"
+        android:padding="12dp"
+        android:text="{[{“Tehran in iran”}, {true}, {false}, {green}],[{“iran language is english”}, {false} ,{true}, {red}], [{“England is in usa”}, {false}, {false}, {black}]} , {30}
 {[{“Tehran in iran”}, {true}, {false}, {green}],[{“iran language is english”}, {false} ,{true}, {red}], [{“England is in usa”}, {false}, {false}, {black}]} , {30}
-{[{“Tehran in iran”}, {true}, {false}, {green}],[{“iran language is english”}, {false} ,{true}, {red}], [{“England is in usa”}, {false}, {false}, {black}]} , {30}"
-            android:layout_height="wrap_content"
-            android:padding="12dp"
-            android:hint="@string/enter_questions"
-            android:includeFontPadding="false"
-            android:inputType="number" />
+{[{“Tehran in iran”}, {true}, {false}, {green}],[{“iran language is english”}, {false} ,{true}, {red}], [{“England is in usa”}, {false}, {false}, {black}]} , {30}" />
 
-        <Button
-            android:id="@+id/button_start"
-            android:layout_width="274dp"
-            android:padding="12dp"
-            android:layout_height="wrap_content"
-            android:text="@string/button_start" />
-
-
-
+    <Button
+        android:id="@+id/button_start"
+        android:layout_width="274dp"
+        android:layout_height="wrap_content"
+        android:padding="12dp"
+        android:text="@string/button_start" />
 
 
 </LinearLayout>
