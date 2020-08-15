@@ -8,7 +8,7 @@ import java.util.UUID;
 public interface RepositoryInterface {
     List<Question> getQuestions();
 
-    Question getQuestion(UUID uuid);
+    Question getList(UUID uuid);
 
     void updateQuestion(Question question);
     void deleteQuestion(Question question);

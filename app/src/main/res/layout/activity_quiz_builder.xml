@@ -18,9 +18,7 @@
         android:inputType="number"
         android:lines="8"
         android:padding="12dp"
-        android:text="{[{“Tehran in iran”}, {true}, {false}, {green}],[{“iran language is english”}, {false} ,{true}, {red}], [{“England is in usa”}, {false}, {false}, {black}]} , {30}
-{[{“Tehran in iran”}, {true}, {false}, {green}],[{“iran language is english”}, {false} ,{true}, {red}], [{“England is in usa”}, {false}, {false}, {black}]} , {30}
-{[{“Tehran in iran”}, {true}, {false}, {green}],[{“iran language is english”}, {false} ,{true}, {red}], [{“England is in usa”}, {false}, {false}, {black}]} , {30}" />
+        android:text="{[{“Tehran in iran”}, {true}, {false}, {green}],[{“iran language is english”}, {false} ,{true}, {red}], [{“England is in usa”}, {false}, {false}, {black}]} ,[{“England is in usa”}, {false}, {false}, {black}]},[{“iran language is english”}, {false} ,{true}, {red}], {300}" />
 
     <Button
         android:id="@+id/button_start"

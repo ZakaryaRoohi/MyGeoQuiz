@@ -1,27 +1,35 @@
 package com.example.myapplication.controller.activity;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-
+import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.example.myapplication.R;
 import com.example.myapplication.model.Question;
+import com.example.myapplication.model.Setting;
 import com.example.myapplication.repository.QuestionRepository;
 import com.example.myapplication.repository.RepositoryInterface;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-
 public class QuizActivity extends AppCompatActivity {
 
+    public static final String BUNDLE_KEY_CURRENT_TIME = "bundleKeyCurrentTime";
+    private static final String NUMBER_OF_ANSWERED = "numberOfAnswered";
+    private static final int REQUEST_CODE_SETTING =1 ;
+    public static final String EXTRA_SETTING_STATES = "com.example.MyGeoQuiz2.settingStates";
+    public static final String EXTRA_CURRENT_TIME = "ExtraCurrentTime";
     private Button mButtonTrue;
     private Button mButtonFalse;
     private TextView mTextViewQuestion;
@@ -31,40 +39,126 @@ public class QuizActivity extends AppCompatActivity {
     private ImageButton mImageButtonPrevious;
     private TextView mTextViewScore;
     private Button mButtonReset;
-    public String intentQuestions;
+    private Button mButtonCheat;
+    private TextView mTextViewTimer;
+    private TextView mTextViewSetting;
+    private Button mButtonRestartHide;
     private RepositoryInterface mRepository;
     public static final String BUNDLE_KEY_CURRENT_INDEX = "mCurrentIndex";
     public static final String BUNDLE_KEY_CURRENT_SCORE = "mCurrentScore";
-    public static final String BUNDLE_KEY_IS_ANSWERED_ARRAY = "mIsAnsweredArray";
+    public static final String EXTRA_BUNDLE_QUESTIONS = "extraBundleQuestions";
+
+    private LinearLayout mLayout1;
+    private LinearLayout mLayout2;
+    private Button mButtonRestart;
     private int mCurrentIndex = 0;
     private int mCurrentScore = 0;
-    private List<Question> mQuestionBank;
-
-
+    private CountDownTimer mCountDownTimer;
+    private TextView mTextViewScoreHide;
+    private int mGameTime;
+    private int mCurrentTime;
+    private int mNumberOfAnswered = 0;
+    private Setting mSetting =new Setting(18,R.color.colorWight,0,
+            0,0,0,0,0,0);
     //*************************           On Create         **************************
+    public static Intent newIntent(Context context, String stringQuestions) {
+        Intent intent = new Intent(context, QuizActivity.class);
+        intent.putExtra(EXTRA_BUNDLE_QUESTIONS, stringQuestions);
+        return intent;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Intent intent = getIntent();
-        intentQuestions = intent.getStringExtra(QuizBuilderActivity.EXTRA_QUESTIONS);
-        mRepository = QuestionRepository.getInstance();
-        mQuestionBank = mRepository.getQuestions();
 
+
+        Intent intent = getIntent();
+        String stringQuestions = intent.getStringExtra(EXTRA_BUNDLE_QUESTIONS);
+        mGameTime = getTime(stringQuestions);
+//        List<Question> questionList = parseQuestions(stringQuestions);
+//        QuestionRepository.getInstance().setQuestions(questionList);
+        mRepository = QuestionRepository.getInstance();
         if (savedInstanceState != null) {
             mCurrentIndex = savedInstanceState.getInt(BUNDLE_KEY_CURRENT_INDEX);
             mCurrentScore = savedInstanceState.getInt(BUNDLE_KEY_CURRENT_SCORE);
+            mGameTime = savedInstanceState.getInt(BUNDLE_KEY_CURRENT_TIME);
+            mNumberOfAnswered = savedInstanceState.getInt(NUMBER_OF_ANSWERED);
 
         }
-
-//        show();
-
         setContentView(R.layout.activity_quiz);
-        //it must be the first task we do after inflate
         findAllViews();
         setClickListeners();
 
         updateQuestion();
         updateScore();
+        setSetting();
+
+
+        mCountDownTimer = new CountDownTimer(mGameTime * 1000, 1000) { // adjust the milli seconds here
+
+            @SuppressLint("SetTextI18n")
+            public void onTick(long millisUntilFinished) {
+
+                mTextViewTimer.setText("time :" + millisUntilFinished / 1000);
+                mCurrentTime = (int) (millisUntilFinished / 1000);
+            }
+
+            public void onFinish() {
+                timeOver();
+
+            }
+        }.start();
+
+
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mCountDownTimer.cancel();
+    }
+
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mCountDownTimer.start();
+        updateQuestion();
+
+    }
+
+
+    private void timeOver() {
+        mLayout1.setVisibility(View.INVISIBLE);
+        mLayout2.setVisibility(View.VISIBLE);
+        String string = "Finish!!! Score :  " + mCurrentScore + "";
+        mTextViewScoreHide.setText(string);
+    }
+
+    private void checkGameOver() {
+        if (mNumberOfAnswered == mRepository.getQuestions().size()) {
+            mLayout1.setVisibility(View.INVISIBLE);
+            mLayout2.setVisibility(View.VISIBLE);
+            String string = "Finish!!! Score :  " + mCurrentScore + "";
+            mNumberOfAnswered=0;
+            mTextViewScoreHide.setText(string);
+
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode != Activity.RESULT_OK || data == null)
+            return;
+        if(requestCode==REQUEST_CODE_SETTING){
+            mSetting= (Setting) data.getSerializableExtra(SettingActivity.EXTRA_CAL_BACK_SETTING);
+            mGameTime= data.getIntExtra(SettingActivity.EXTRA_SAVED_TIME,10);
+            setSetting();
+            updateQuestion();
+
+
+        }
     }
 
     //*************************           onSaveInstanceState         **************************
@@ -73,6 +167,9 @@ public class QuizActivity extends AppCompatActivity {
         super.onSaveInstanceState(outState);
         outState.putInt(BUNDLE_KEY_CURRENT_INDEX, mCurrentIndex);
         outState.putInt(BUNDLE_KEY_CURRENT_SCORE, mCurrentScore);
+        outState.putInt(BUNDLE_KEY_CURRENT_TIME, mCurrentTime);
+        outState.putInt(NUMBER_OF_ANSWERED, mNumberOfAnswered);
+
     }
 
     //*************************           findAllViews         **************************
@@ -86,36 +183,53 @@ public class QuizActivity extends AppCompatActivity {
         mImageButtonPrevious = findViewById(R.id.imageButton_previous);
         mTextViewScore = findViewById(R.id.textView_score);
         mButtonReset = findViewById(R.id.button_reset);
+        mTextViewTimer = findViewById(R.id.textView_timer);
+        mLayout1 = findViewById(R.id.layout1);
+        mLayout2 = findViewById(R.id.layout2);
+        mButtonRestart = findViewById(R.id.button_restart_hide);
+        mTextViewScoreHide = findViewById(R.id.textView_score_hide);
+        mButtonCheat = findViewById(R.id.button_cheat);
+        mTextViewSetting = findViewById(R.id.textView_setting);
 
+
+    }
+    private void setSetting() {
+        mLayout1.setBackgroundColor(getResources().getColor(mSetting.getColorBackground()));
+        mButtonTrue.setVisibility(mSetting.getStateTrueButton());
+        mButtonFalse.setVisibility(mSetting.getStateFalseButton());
+        mImageButtonNext.setVisibility(mSetting.getStateNextButton());
+        mImageButtonPrevious.setVisibility(mSetting.getStatePreviousButton());
+        mButtonFirst.setVisibility(mSetting.getStateFirstButton());
+        mButtonLast.setVisibility(mSetting.getStateLastButton());
+        mButtonCheat.setVisibility(mSetting.getStateCheatButton());
     }
 
     //*************************           updateQuestion         **************************
     private void updateQuestion() {
+        Question currentQuestion = mRepository.getQuestions().get(mCurrentIndex);
+        mTextViewQuestion.setText(currentQuestion.getTextQuestion());
 
-        if (mQuestionBank.get(mCurrentIndex).getIsAnswered()) {
+        if (mRepository.getQuestions().get(mCurrentIndex).getIsAnswered()) {
             mButtonTrue.setEnabled(false);
             mButtonFalse.setEnabled(false);
         } else {
             mButtonTrue.setEnabled(true);
             mButtonFalse.setEnabled(true);
         }
-        Question currentQuestion = mQuestionBank.get(mCurrentIndex);
-        mTextViewQuestion.setText(currentQuestion.getTextQuestion());
+        checkGameOver();
 
     }
 
     //*************************           resetQuestions         **************************
     public void resetQuestions() {
-//        for (Question question : mQuestionBank) question.mIsAnswered = false;
-        for (int i = 0; i < mQuestionBank.size(); i++)
-            mQuestionBank.get(i).setIsAnswered(false);
-//        isAnsweredArray.set(i, false);
+        for (int i = 0; i < mRepository.getQuestions().size(); i++)
+            mRepository.getQuestions().get(i).setIsAnswered(false);
 
     }
 
     //*************************           updateScore         **************************
     private void updateScore() {
-        String string = "امتياز شما: " + mCurrentScore + "";
+        String string = "Score :  " + mCurrentScore + "";
         mTextViewScore.setText(string);
 
     }
@@ -126,8 +240,8 @@ public class QuizActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 checkAnswer(true);
-                mQuestionBank.get(mCurrentIndex).setIsAnswered(true);
-                mQuestionBank.get(mCurrentIndex).setIsAnswered(true);
+                ++mNumberOfAnswered;
+                updateQuestion();
             }
         });
 
@@ -135,15 +249,15 @@ public class QuizActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 checkAnswer(false);
-                mQuestionBank.get(mCurrentIndex).setIsAnswered(true);
-                mQuestionBank.get(mCurrentIndex).setIsAnswered(true);
+                ++mNumberOfAnswered;
+                updateQuestion();
             }
         });
 
         mImageButtonNext.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mCurrentIndex = (++mCurrentIndex) % mQuestionBank.size();
+                mCurrentIndex = (++mCurrentIndex) % mRepository.getQuestions().size();
                 updateQuestion();
             }
         });
@@ -151,7 +265,7 @@ public class QuizActivity extends AppCompatActivity {
         mImageButtonPrevious.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mCurrentIndex = (--mCurrentIndex + mQuestionBank.size()) % mQuestionBank.size();
+                mCurrentIndex = (--mCurrentIndex + mRepository.getQuestions().size()) % mRepository.getQuestions().size();
                 updateQuestion();
             }
         });
@@ -165,14 +279,14 @@ public class QuizActivity extends AppCompatActivity {
         mButtonLast.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mCurrentIndex = mQuestionBank.size() - 1;
+                mCurrentIndex = mRepository.getQuestions().size() - 1;
                 updateQuestion();
             }
         });
         mTextViewQuestion.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mCurrentIndex = (++mCurrentIndex) % mQuestionBank.size();
+                mCurrentIndex = (++mCurrentIndex) % mRepository.getQuestions().size();
                 updateQuestion();
             }
         });
@@ -180,22 +294,53 @@ public class QuizActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                String string = "امتياز شما: " + mCurrentScore + "";
-                mTextViewScore.setText(string);
                 mCurrentScore = 0;
                 updateScore();
                 resetQuestions();
                 mCurrentIndex = 0;
                 updateQuestion();
 
+
             }
         });
+        mButtonRestart.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mLayout1.setVisibility(View.VISIBLE);
+                mLayout2.setVisibility(View.INVISIBLE);
+                mCurrentScore = 0;
+                updateScore();
+                resetQuestions();
+                mCurrentIndex = 0;
+                updateQuestion();
+                mCountDownTimer.start();
+
+
+            }
+        });
+        mButtonCheat.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = CheatActivity.newIntent(QuizActivity.this, mCurrentIndex);
+                startActivity(intent);
+            }
+        });
+        mTextViewSetting.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(QuizActivity.this, SettingActivity.class);
+                intent.putExtra(EXTRA_SETTING_STATES, mSetting);
+                intent.putExtra(BUNDLE_KEY_CURRENT_TIME, mCurrentTime);
+                startActivityForResult(intent, REQUEST_CODE_SETTING);
+            }
+        });
+
+
     }
 
     //*************************           checkAnswer         **************************
     private void checkAnswer(boolean userPressed) {
-        boolean isAnswerTrue = mQuestionBank.get(mCurrentIndex).isAnswerTrue();
-//        boolean isAnswerTrue = isAnsweredArray[mCurrentIndex];
+        boolean isAnswerTrue = mRepository.getQuestions().get(mCurrentIndex).isAnswerTrue();
         if (userPressed == isAnswerTrue) {
             Toast.makeText(this, R.string.toast_correct, Toast.LENGTH_LONG).show();
             mCurrentScore++;
@@ -205,14 +350,16 @@ public class QuizActivity extends AppCompatActivity {
             Toast.makeText(this, R.string.toast_incorrect, Toast.LENGTH_LONG).show();
 
         }
-        mQuestionBank.get(mCurrentIndex).setIsAnswered(true);
+        mRepository.getQuestions().get(mCurrentIndex).setIsAnswered(true);
 
-        mButtonTrue.setEnabled(false);
-        mButtonFalse.setEnabled(false);
+
     }
 
-    private void show() {
-        Toast.makeText(this, intentQuestions, Toast.LENGTH_LONG).show();
+
+    private static int getTime(String string) {
+        int lastOpenBrace = string.lastIndexOf('{');
+        int lastCloseBrace = string.lastIndexOf('}');
+        return Integer.parseInt(string.substring(lastOpenBrace + 1, lastCloseBrace));
     }
 
 

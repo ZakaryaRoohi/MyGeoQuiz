@@ -9,8 +9,6 @@ import java.util.UUID;
 
 public class QuestionRepository implements RepositoryInterface {
     private static QuestionRepository sQuestionRepository;
-    private static final int NUMBER_OF_QUESTIONS = 20;
-    List<Question> mReceiveQuestions;
 
     public static QuestionRepository getInstance() {
         if (sQuestionRepository == null) {
@@ -27,7 +25,7 @@ public class QuestionRepository implements RepositoryInterface {
         return mQuestions;
     }
 
-    public void setQuestions(List<Question> questions) {
+    public   void setQuestions(List<Question> questions) {
         mQuestions = questions;
     }
 
@@ -41,7 +39,7 @@ public class QuestionRepository implements RepositoryInterface {
 
     }
 
-    public Question getQuestion(UUID uuid) {
+    public Question getList(UUID uuid) {
         for (Question question : mQuestions) {
             if (question.getId().equals(uuid))
                 return question;

@@ -9,7 +9,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".controller.activity.QuestionListActivity"></activity>
+        <activity android:name=".controller.activity.SettingActivity"></activity>
+        <activity android:name=".controller.activity.QuestionListActivity" />
         <activity android:name=".controller.activity.CheatActivity" />
         <activity android:name=".controller.activity.QuizBuilderActivity">
             <intent-filter>

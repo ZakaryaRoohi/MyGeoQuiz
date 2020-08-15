@@ -21,5 +21,32 @@
     <string name="enter_questions">Enter Questions</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="restart">شروع مجدد</string>
+    <string name="button_back">بازگشت</string>
+    <string name="button_cheat">تقلب میکنم</string>
+    <string name="cheat_warning">واقعا میخوای تقلب کنی؟؟؟</string>
+
+
+    <string name="score_0"> : امتیاز  </string>
+    <string name="current_index">currentIndex</string>
+    <string name="number_of_answered">number</string>
+    <string name="question_bank">Question_bank</string>
+    <string name="Current_Index" />
+    <string name="Number_Of_Answered" />
+    <string name="Question_Bank" />
+    <string name="toast_judgment">تقلب کار خوبی نیست</string>
+    <string name="True_button">True Button</string>
+    <string name="false_button">False Button</string>
+    <string name="red">Red</string>
+    <string name="green">Green</string>
+    <string name="wight">White</string>
+    <string name="blue">Blue</string>
+    <string name="next_button">Next Button</string>
+    <string name="previous_button">Previous Button</string>
+    <string name="first_button">First Button</string>
+    <string name="last_button">Last Button</string>
+    <string name="cheat_button">Cheat Button</string>
+    <string name="question_text_size">Question Text Size</string>
+    <string name="small">Small</string>
 
 </resources>
