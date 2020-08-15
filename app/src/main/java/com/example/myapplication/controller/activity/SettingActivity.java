@@ -6,12 +6,14 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.RadioButton;
 import android.widget.Switch;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.myapplication.R;
 import com.example.myapplication.model.Setting;
+import com.example.myapplication.repository.UserRepository;
 
 
 public class SettingActivity extends AppCompatActivity {
@@ -36,6 +38,7 @@ public class SettingActivity extends AppCompatActivity {
     private Button mButtonSave;
     private Button mDiscard;
     private int mTime;
+    private UserRepository mUserRepository;
 
     private Boolean mIsSaved = false;
     private Setting mSettingNew;
@@ -46,7 +49,10 @@ public class SettingActivity extends AppCompatActivity {
         setContentView(R.layout.activity_setting);
         findViews();
         Intent intent = getIntent();
-        mSettingNew = (Setting) intent.getSerializableExtra(QuizActivity.EXTRA_SETTING_STATES);
+//        mSettingNew = (Setting) intent.getSerializableExtra(QuizActivity.EXTRA_SETTING_STATES);
+        mUserRepository = UserRepository.getInstance();
+        mSettingNew = mUserRepository.getSetting();
+
         mTime = intent.getIntExtra(QuizActivity.BUNDLE_KEY_CURRENT_TIME,15);
         setCurrentStateQuizActivity();
         if (savedInstanceState != null) {
@@ -62,7 +68,10 @@ public class SettingActivity extends AppCompatActivity {
         super.onSaveInstanceState(outState);
         outState.putSerializable(SETTING_BUNDLE, mSettingNew);
 
+
     }
+
+
 
     private void findViews() {
         mSmallSize = findViewById(R.id.radio_botton_small);
@@ -234,6 +243,7 @@ public class SettingActivity extends AppCompatActivity {
             Intent intent = new Intent();
             intent.putExtra(EXTRA_CAL_BACK_SETTING, mSettingNew);
             intent.putExtra(EXTRA_SAVED_TIME,mTime);
+            mUserRepository.SetSetting(mSettingNew);
             setResult(RESULT_OK, intent);
 
         }

@@ -1,9 +1,7 @@
 package com.example.myapplication.repository;
 
-import com.example.myapplication.enums.QuestionTextColor;
 import com.example.myapplication.model.Question;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -25,7 +23,7 @@ public class QuestionRepository implements RepositoryInterface {
         return mQuestions;
     }
 
-    public   void setQuestions(List<Question> questions) {
+    public void setQuestions(List<Question> questions) {
         mQuestions = questions;
     }
 

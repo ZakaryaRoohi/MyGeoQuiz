@@ -11,7 +11,9 @@ import android.widget.Toast;
 
 import com.example.myapplication.R;
 import com.example.myapplication.model.Question;
+import com.example.myapplication.model.Setting;
 import com.example.myapplication.repository.QuestionRepository;
+import com.example.myapplication.repository.UserRepository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,10 +47,20 @@ public class QuizBuilderActivity extends AppCompatActivity {
                     Toast.makeText(QuizBuilderActivity.this, "Invalid Input", Toast.LENGTH_SHORT).show();
                 } else {
 
+
+
                     String stringQuestions = mEditText.getText().toString();
+
+                    int gameTime =  getTime(stringQuestions);
+                    Setting setting = new Setting(18, R.color.colorWight, 0,
+                            0, 0, 0, 0, 0, 0 , gameTime);
+                    UserRepository.getInstance().SetSetting(setting);
+
+
                     List<Question> questionList = parseQuestions(stringQuestions);
                     QuestionRepository.getInstance().setQuestions(questionList);
-                    Intent intent = QuizActivity.newIntent(QuizBuilderActivity.this,stringQuestions);
+
+                    Intent intent = QuizActivity.newIntent(QuizBuilderActivity.this);
                     startActivity(intent);
                 }
 
@@ -73,6 +85,11 @@ public class QuizBuilderActivity extends AppCompatActivity {
 
         }
         return mQuestionsBank;
+    }
+    private static int getTime(String string) {
+        int lastOpenBrace = string.lastIndexOf('{');
+        int lastCloseBrace = string.lastIndexOf('}');
+        return Integer.parseInt(string.substring(lastOpenBrace + 1, lastCloseBrace));
     }
 
 

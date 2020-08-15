@@ -15,19 +15,30 @@ public class Setting implements Serializable {
     private int mStateFirstButton;
     private int mStateLastButton;
     private int mStateCheatButton;
+    private int mGameTime;
 
-    public Setting(int mTextSize, int mColorBackground, int mStateTrueButton, int mStateFalseButton,
-                   int mStateNextButton, int mStatePreviousButton, int mStateFirstButton,
-                   int mStateLastButton, int mStateCheatButton) {
-        this.mTextSize = mTextSize;
-        this.mColorBackground = mColorBackground;
-        this.mStateTrueButton = mStateTrueButton;
-        this.mStateFalseButton = mStateFalseButton;
-        this.mStateNextButton = mStateNextButton;
-        this.mStatePreviousButton = mStatePreviousButton;
-        this.mStateFirstButton = mStateFirstButton;
-        this.mStateLastButton = mStateLastButton;
-        this.mStateCheatButton = mStateCheatButton;
+
+
+    public Setting(int textSize, int backgroundColor, int trueButtonState, int falseButtonState,
+                   int nextButtonState, int previousButtonState, int firstButtonState,
+                   int lastButtonState, int cheatButtonState , int gameTime) {
+        this.mTextSize = textSize;
+        this.mColorBackground = backgroundColor;
+        this.mStateTrueButton = trueButtonState;
+        this.mStateFalseButton = falseButtonState;
+        this.mStateNextButton = nextButtonState;
+        this.mStatePreviousButton = previousButtonState;
+        this.mStateFirstButton = firstButtonState;
+        this.mStateLastButton = lastButtonState;
+        this.mStateCheatButton = cheatButtonState;
+        this.mGameTime= gameTime;
+    }
+    public int getGameTime() {
+        return mGameTime;
+    }
+
+    public void setGameTime(int gameTime) {
+        mGameTime = gameTime;
     }
 
     public int getTextSize() {
@@ -99,5 +110,20 @@ public class Setting implements Serializable {
 
     public void setStateCheatButton(int mStateCheatButton) {
         this.mStateCheatButton = mStateCheatButton;
+    }
+
+    @Override
+    public String toString() {
+        return "Setting{" +
+                "mTextSize=" + mTextSize +
+                ", mColorBackground=" + mColorBackground +
+                ", mStateTrueButton=" + mStateTrueButton +
+                ", mStateFalseButton=" + mStateFalseButton +
+                ", mStateNextButton=" + mStateNextButton +
+                ", mStatePreviousButton=" + mStatePreviousButton +
+                ", mStateFirstButton=" + mStateFirstButton +
+                ", mStateLastButton=" + mStateLastButton +
+                ", mStateCheatButton=" + mStateCheatButton +
+                '}';
     }
 }
